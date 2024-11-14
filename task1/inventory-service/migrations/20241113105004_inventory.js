@@ -11,7 +11,7 @@ exports.up = function (knex) {
     table.integer('order_amount').notNullable()
 
     table.foreign('plu_id').references('plu_id').inTable('products')
-    table.foreign('shop_id').references('id').inTable('shop')
+    table.foreign('shop_id').references('shop_id').inTable('shops')
 
   })
 };

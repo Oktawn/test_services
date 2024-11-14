@@ -3,8 +3,8 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-  return knex.schema.createTable('shop', (table) => {
-    table.increments('id').primary()
+  return knex.schema.createTable('shops', (table) => {
+    table.increments('shop_id').primary()
     table.string('name').notNullable()
   })
 };
@@ -14,5 +14,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-  return knex.schema.dropTableIfExists('shop');
+  return knex.schema.dropTableIfExists('shops');
 };
