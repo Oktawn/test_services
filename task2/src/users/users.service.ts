@@ -10,7 +10,9 @@ export class UsersService {
 
   async getProblems() {
     const problems = await this.usersRep.update({ problems: true }, { problems: false });
-    return problems.affected;
+    return {
+      'was problems': problems.affected
+    };
   }
 
 }
