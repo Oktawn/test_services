@@ -1,9 +1,16 @@
+require("dotenv").config();
 const Router = require('@koa/router')
 const invService = require('./inventory.service')
 
 const router = new Router()
 
+const loadLogs = async (ctx, next) => {
+  invService.loadLogs(ctx.request.body, ctx.query, ctx.path);
+  await next();
+}
+
 router.prefix('/inventory')
+router.use(loadLogs)
 
 router.get('/shop', async (ctx) => {
   const { shop_id } = ctx.query

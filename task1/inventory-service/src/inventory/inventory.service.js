@@ -1,4 +1,8 @@
 const db = require('../../connectDB.js')
+const axios = require('axios')
+
+const portLog = process.env.LOGGER_PORT
+const pathLog = `http://localhost:${portLog}/logs/write`
 
 /** 
 * @param {number} plu_id
@@ -162,6 +166,68 @@ async function decStockOnName(plu_id, shop_id, dec_amount, name_stock) {
 
 }
 
+async function loadLogs(body, query, path) {
+  let action, data
+  if (body) {
+    console.log('this body')
+    const { plu_id, shop_id, shop_amount, order_amount,
+      inc_amount, dec_amount, name_stock } = body
+
+    if (name_stock === 'shop_amount' || name_stock === 'order_amount') {
+      action = 'updated'
+      data = {
+        "plu_id": plu_id,
+        "shop_id": shop_id,
+        "diff_amount": `+${inc_amount}` || `-${dec_amount}`,
+        "name_stock": name_stock
+      }
+    }
+    else {
+      action = 'added'
+      data = {
+        "plu_id": plu_id,
+        "shop_id": shop_id,
+        "shop_amount": shop_amount,
+        "order_amount": order_amount
+      }
+
+
+    }
+    const jsonData = JSON.stringify({ plu_id, shop_id, action, data })
+    axios.post(pathLog, jsonData, { headers: { 'Content-Type': 'application/json' } })
+      .catch(err => console.log(err))
+  }
+  else if (query) {
+    action = "get"
+    const { plu_id, shop_id, min_amount, max_amount } = query
+    if (shop_id) {
+      if (min_amount && max_amount) {
+        data = {
+          "where": path,
+          "shop_id": shop_id,
+          "min_amount": min_amount,
+          "max_amount": max_amount
+        }
+      }
+      else {
+        data = {
+          "where": path,
+          "shop_id": shop_id
+        }
+      }
+    }
+    else if (plu_id) {
+      data = {
+        "where": path,
+        "plu_id": plu_id
+      }
+    }
+    const jsonData = JSON.stringify({ plu_id, shop_id, action, data })
+    axios.post(pathLog, jsonData, { headers: { 'Content-Type': 'application/json' } })
+      .catch(err => console.log(err))
+  }
+}
+
 
 
 module.exports = {
@@ -171,5 +237,6 @@ module.exports = {
   getStockShop,
   addProductInShop,
   incStockOnName,
-  decStockOnName
+  decStockOnName,
+  loadLogs
 }
